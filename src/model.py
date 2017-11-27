@@ -2,9 +2,6 @@ import tensorflow as tf
 import numpy as np
 
 import matplotlib
-# OSX fix
-matplotlib.use('TkAgg')
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 

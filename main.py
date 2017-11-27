@@ -28,10 +28,7 @@ from argparse import ArgumentParser
 from src.model import CryptoNet
 from src.config import *
 
-
-def build_parser():
-    parser = ArgumentParser()
-
+def add_custom_args(parser):
     parser.add_argument('--msg-len', type=int,
                         dest='msg_len', help='message length',
                         metavar='MSG_LEN', default=MSG_LEN)
@@ -49,16 +46,19 @@ def build_parser():
                         dest='batch_size', help='batch size',
                         metavar='BATCH_SIZE', default=BATCH_SIZE)
 
-    return parser
-
-
 def main():
-    parser = build_parser()
-    options = parser.parse_args()
+    parser = ArgumentParser()
+    add_custom_args(parser)
+    args = parser.parse_args()
 
-    with tf.Session() as sess:
-        crypto_net = CryptoNet(sess, msg_len=options.msg_len, epochs=options.epochs,
-                               batch_size=options.batch_size, learning_rate=options.learning_rate)
+    sess = tf.Session()
+
+    with sess.as_default():
+        crypto_net = CryptoNet(sess,
+        msg_len=args.msg_len,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        learning_rate=args.learning_rate)
 
         crypto_net.train()
 
