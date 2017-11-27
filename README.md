@@ -30,7 +30,7 @@ $ source ~/rl-cryp/bin/activate
 $ pip install -r requirements.txt
 ```
 
-> `rl-env` is an arbitrary directory. You can replace `rl-env` with a directory of your choice.
+> `rl-cryp` is an arbitrary directory. You can replace `rl-env` with a directory of your choice.
 
 ## Run
 
