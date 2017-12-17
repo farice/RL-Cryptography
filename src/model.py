@@ -125,12 +125,12 @@ class CryptoNet(object):
 
     def plot_errors(self):
         """
-        Plot Lowest Decryption Errors achieved by Bob and Eve per epoch
+        Plot Lowest Decryption Errors achieved by Recipient and Eavesdropper per epoch
         """
         sns.set_style("darkgrid")
         plt.plot(self.bob_errors)
         plt.plot(self.eve_errors)
-        plt.legend(['bob', 'eve'])
+        plt.legend(['Recipient with key', 'Eavesdropper without key'])
         plt.xlabel('Epoch')
         plt.ylabel('Lowest Decryption error achieved')
         plt.show()

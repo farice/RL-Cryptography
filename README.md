@@ -22,8 +22,8 @@ $ sudo pip install --upgrade virtualenv
 2. Clone the repository and install the requirements
 
 ```bash
-$ git clone https://github.com/brodykellish/rl-agents
-$ cd RLFlow
+$ git https://github.com/farice/RL-Cryptography
+$ cd RL-Cryptography
 $ mkdir ~/rl-cryp
 $ virtualenv --system-site-packages ~/rl-cryp
 $ source ~/rl-cryp/bin/activate
@@ -45,7 +45,7 @@ $ python main.py --msg-len 32 --epochs 50
 Once finished deactivate the virtual environment
 
 ```bash
-(rl-cryp)$ deactivate
+$ (rl-cryp) deactivate
 ```
 
 ## Cited Publications
