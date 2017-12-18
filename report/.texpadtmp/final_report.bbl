@@ -1,0 +1,39 @@
+\begin{thebibliography}{1}
+
+\bibitem{elderman2017adversarial}
+R.~Elderman, L.~J. Pater, A.~S. Thie, M.~M. Drugan, and M.~Wiering,
+  ``Adversarial reinforcement learning in a cyber security simulation.,'' in
+  {\em ICAART (2)}, pp.~559--566, 2017.
+
+\bibitem{abadi2016learning}
+M.~Abadi and D.~G. Andersen, ``Learning to protect communications with
+  adversarial neural cryptography,'' {\em arXiv preprint arXiv:1610.06918},
+  2016.
+
+\bibitem{shiva2010game}
+S.~Shiva, S.~Roy, and D.~Dasgupta, ``Game theory for cyber security,'' in {\em
+  Proceedings of the Sixth Annual Workshop on Cyber Security and Information
+  Intelligence Research}, p.~34, ACM, 2010.
+
+\bibitem{finn2016connection}
+C.~Finn, P.~Christiano, P.~Abbeel, and S.~Levine, ``A connection between
+  generative adversarial networks, inverse reinforcement learning, and
+  energy-based models,'' {\em arXiv preprint arXiv:1611.03852}, 2016.
+
+\bibitem{pfau2016connecting}
+D.~Pfau and O.~Vinyals, ``Connecting generative adversarial networks and
+  actor-critic methods,'' {\em arXiv preprint arXiv:1610.01945}, 2016.
+
+\bibitem{pinto2017robust}
+L.~Pinto, J.~Davidson, R.~Sukthankar, and A.~Gupta, ``Robust adversarial
+  reinforcement learning,'' {\em arXiv preprint arXiv:1703.02702}, 2017.
+
+\bibitem{lin2014multi}
+X.~Lin, P.~A. Beling, and R.~Cogill, ``Multi-agent inverse reinforcement
+  learning for zero-sum games,'' {\em arXiv preprint arXiv:1403.6508}, 2014.
+
+\bibitem{sutton2016reinforcement}
+R.~Sutton and A.~Barto, ``Reinforcement learning: an introduction.[internet],''
+  2016.
+
+\end{thebibliography}
