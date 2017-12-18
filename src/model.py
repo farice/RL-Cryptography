@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -133,4 +134,4 @@ class CryptoNet(object):
         plt.legend(['Recipient with key', 'Eavesdropper without key'])
         plt.xlabel('Epoch')
         plt.ylabel('Lowest Decryption error achieved')
-        plt.show()
+        plt.savefig('GAN_anc')
