@@ -8,10 +8,28 @@
 %
 \documentclass{llncs}
 \usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{listings}
+\usepackage[pass]{geometry}
+% \usepackage{vmargin}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{amsfonts,amssymb,cite,float,graphicx}
+% \usepackage[tight,footnotesize]{subfigure}
+\usepackage[usenames]{color}
+\usepackage{algorithm,algorithmic}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{mathtools}
+
 \doublespacing
 \begin{document}
 
-\title{Using Reinforcement Learning to Encrypt Communications}
+\title{Protecting Communications with Reinforcement Learning in a Multi-Agent Game}
 %
 \titlerunning{Hamiltonian Mechanics}  % abbreviated title (for running head)
 %                                     also used for the TOC unless
@@ -34,16 +52,12 @@ Consultant\\
 \maketitle              % typeset the title of the contribution
 
 \begin{abstract}
-Here we explore the ability of reinforcement learning (RL) agents to cooperate to establish a secure communication protocol in the face of an adversary without explicit communication. Hence, we construct a general sum game to measure multi-agent communication and encryption efficacy. We compare our results with parallel experiments involving generative adversarial networks. Furthermore, we consider the practical implications and viability of RL cryptography--particularly in the context of quantum computing.
-\keywords{reinforcement learning, multi-agent, communication, cryptography, generative adversarial networks, quantum computing}
+Here we explore the ability of reinforcement learning (RL) agents to cooperate to establish a secure communication protocol in the face of an adversary without explicit communication. Hence, we construct a general sum mixed cooperative-competitive game to study the effectiveness of various multi-agent RL algorithms to perform in this environment. We compare our results with parallel experiments involving generative adversarial networks. We conclude that the Multi-Agent Deep Deterministic Policy Gradient algorithm prescribed in \cite{lowe2017multi} converges toward the desired behavior of securing protected communications in a period of time with which the other RL algorithms do not, and furthermore it represents a stronger result than the one involving GANs.
+\keywords{reinforcement learning, multi-agent, communication, cryptography, generative adversarial networks, multi-agent actor-critic}
 \end{abstract}
 %
 \section{Introduction}
 %
-Reinforcement learning (RL) has been applied to increasingly complex tasks, ranging from . 
-
-%
-\subsection{Autonomous Systems}
 %1. What problem does your project address? If you have chosen an application area, please remember that I may not be an expert in the application you have chosen, so be sure to describe the application area clearly.
 %
 %2. What methods did you use to address the problem?
@@ -60,362 +74,79 @@ Reinforcement learning (RL) has been applied to increasingly complex tasks, rang
 %
 %8. How did your consultant contribute to your project?
 %
-In this section, we will consider the case when the Hamiltonian $H(x)$
-is autonomous. For the sake of simplicity, we shall also assume that it
-is $C^{1}$.
+Reinforcement learning (RL) has been applied to increasingly complex tasks, ranging from Atari games to robotics. In most cases, the single-agent paradigm is pervasive given that predicting the behavior of other actors is unneeded.
 
-We shall first consider the question of nontriviality, within the
-general framework of
-$\left(A_{\infty},B_{\infty}\right)$-subquadratic Hamiltonians. In
-the second subsection, we shall look into the special case when $H$ is
-$\left(0,b_{\infty}\right)$-subquadratic,
-and we shall try to derive additional information.
+Nevertheless, studying multi-agent systems is increasingly important if we expect to scale RL to interactive systems rather than applying the technique in a vacuum. We may expect that some sort of emergent, co-evolutionary behavior would evolve in a multi-agent setting. Hence, we can ask questions pertaining to social dilemmas\cite{leibo2017multi} and language\cite{foerster2016learning}, reaching Nash equilbria in cooperative or competitive games\cite{pinto2017robust}, or the ability to develop communication to achieve cooperative control tasks\cite{gupta2017cooperative} or even solve riddles\cite{foerster2016learning}.
+
+Here we consider a mixed cooperative-competitive where an agent must communicate to another agent in the presence of an adversary. We find this worth considering because it allows us to study (1) the effectiveness of various RL and non-RL algorithms in a Markov game (defined below) of this type, (2) whether agents can protect their communications without being provided with an explicit cryptographic algorithm, and more broadly (3) whether and/or what kind of equilibria we observe depending on our algorithm and reward structures. 
+
+Ultimately, we show that the simple multi-agent extensions of popular reinforcement learning algorithms perform poorly while the Multi-Agent Deep Deterministic Policy Gradient algorithm developed in \cite{lowe2017multi} produces a competitive game. Furthermore, the GAN context described in \cite{abadi2016learning} seems to allow for protected communications between agents but we'll argue that it's likely because of the limited decryption capability one might expect in this setup. 
+
+Hence, the goal of this paper is to take the cryptography game defined in \cite{abadi2016learning} which is suitable for GANs, then to revise and modify it as a Markov game so it is suitable for the multi-agent RL context, and finally to evaluate the effectiveness of various MARL algorithms in this setting.
+\subsection{The Problem}
 %
-\subsubsection{The General Case: Nontriviality.}
+The general game is simple.
+
+We seek to define 3 agents Alice, Bob, and Eve such that Alice communicates a message to Bob who must reconstruct the message. Furthermore, adversary Eve observes the channel and additionally seeks to reconstruct the message. Hence, Alice and Bob should be penalized based off of Eve's reconstruction and rewarded based off of Bob's. Furthermore, Alice and Bob use a symmetric, randomly generated key (not available to Eve) to encode their message in a manner with which they define. 
+\section{Methods}
+\subsection{Markov Games}
+First, we must extend the traditional Markov Decision Process (MDP) to the multi-agent setting. This is well documented and termed as a Markov Game\cite{leibo2017multi}. An $N$-agent Markov game is given by a collection states $\{ S \}$ with which any agent can take, in addition to actions $\{ A_1 \cdots A_N \}$ and observations $\{ O_1 \cdots O_N \}$. The $i$th agent uses a stochastic policy $\pi_i : O_i \times A_i \rightarrow [0,1]$ which takes the agent to the next state according to the state transition function $\mathcal{T}: S \times A_1 \times \cdots \times A_N \rightarrow S$. Similarly, the $i$th agent obtains rewards as a function of the state and action, and receives an observation. Each agent seeks to maximize its total expected return $R_i = \sum_{t=0}^T \gamma^t r_i^t$ where $r_i : S \times A_i \rightarrow \mathbb{R}$ is the reward associated with the taken action with $\gamma$ as the discount factor and $T$ the time horizon.  
 %
-We assume that $H$ is
-$\left(A_{\infty},B_{\infty}\right)$-sub\-qua\-dra\-tic at infinity,
-for some constant symmetric matrices $A_{\infty}$ and $B_{\infty}$,
-with $B_{\infty}-A_{\infty}$ positive definite. Set:
-\begin{eqnarray}
-\gamma :&=&{\rm smallest\ eigenvalue\ of}\ \ B_{\infty} - A_{\infty} \\
-  \lambda : &=& {\rm largest\ negative\ eigenvalue\ of}\ \
-  J \frac{d}{dt} +A_{\infty}\ .
-\end{eqnarray}
+\subsection{Extending Popular Single-Agent Algorithms}
+With this notation in mind, we can readily popular single-agent algorithms to the multi-agent paradigm.
 
-Theorem~\ref{ghou:pre} tells us that if $\lambda +\gamma < 0$, the
-boundary-value problem:
-\begin{equation}
-\begin{array}{rcl}
-  \dot{x}&=&JH' (x)\\
-  x(0)&=&x (T)
-\end{array}
-\end{equation}
-has at least one solution
-$\overline{x}$, which is found by minimizing the dual
-action functional:
-\begin{equation}
-  \psi (u) = \int_{o}^{T} \left[\frac{1}{2}
-  \left(\Lambda_{o}^{-1} u,u\right) + N^{\ast} (-u)\right] dt
-\end{equation}
-on the range of $\Lambda$, which is a subspace $R (\Lambda)_{L}^{2}$
-with finite codimension. Here
-\begin{equation}
-  N(x) := H(x) - \frac{1}{2} \left(A_{\infty} x,x\right)
-\end{equation}
-is a convex function, and
-\begin{equation}
-  N(x) \le \frac{1}{2}
-  \left(\left(B_{\infty} - A_{\infty}\right) x,x\right)
-  + c\ \ \ \forall x\ .
-\end{equation}
+$Q$-learning uses an action-value function for a policy which can be written recursively as $Q^\pi(s,a)= \mathbb{E}_{s'}[r(s,a) + \gamma \mathbb{E}_{a'}[Q^\pi(s', a')]]$. Hence, $Q$-learning can be extended by simply allowing each agent to learn its independently optimal $Q_i$. 
 
-%
-\begin{proposition}
-Assume $H'(0)=0$ and $ H(0)=0$. Set:
-\begin{equation}
-  \delta := \liminf_{x\to 0} 2 N (x) \left\|x\right\|^{-2}\ .
-  \label{eq:one}
-\end{equation}
+Policy gradient 
 
-If $\gamma < - \lambda < \delta$,
-the solution $\overline{u}$ is non-zero:
-\begin{equation}
-  \overline{x} (t) \ne 0\ \ \ \forall t\ .
-\end{equation}
-\end{proposition}
-%
-\begin{proof}
-Condition (\ref{eq:one}) means that, for every
-$\delta ' > \delta$, there is some $\varepsilon > 0$ such that
-\begin{equation}
-  \left\|x\right\| \le \varepsilon \Rightarrow N (x) \le
-  \frac{\delta '}{2} \left\|x\right\|^{2}\ .
-\end{equation}
+\subsection{Multi-Agent Deep Deterministic Policy Gradient}
 
-It is an exercise in convex analysis, into which we shall not go, to
-show that this implies that there is an $\eta > 0$ such that
-\begin{equation}
-  f\left\|x\right\| \le \eta
-  \Rightarrow N^{\ast} (y) \le \frac{1}{2\delta '}
-  \left\|y\right\|^{2}\ .
-  \label{eq:two}
-\end{equation}
+\section{Theoretical Matters}
 
+\section{Experiments}
+
+\subsection{GANs}
+
+Following the experimental setup defined in \cite{abadi2016learning}, we setup a mirror experiment with code written in TensorFlow to observe whether neural networks can learn to protect communications between one another.
+
+In summary, we had Alice, Bob, and Eve represented as neural networks. Alice has inputs $P$ and $K$ corresponding to the plaintext message and symmetric key and output $C$ the ciphertext. Bob has inputs $C$ and $K$ with output $P_B$ which is Bob's decryption of $P$. Finally, Eve simply has input $C$ and output $P_E$. 
+
+Eve has the simple loss function which corresponds to the L1 distance between $P_E$ and $P$. Alice and Bob share the loss function which corresponds to L1 distance between $P_B$ and $P$ minus $(N/2 - \text{Eve L1 error})^2/(N/2)^2$ where $N$ is the length of $P$. The authors note the peculiarity of this loss function.
+
+In addition to this peculiarity, the authors concede that they had to cute a number of corners to achieve the expected behavior. Note also that the agents are trained in an alternating pattern, switch back and forth between training Eve and then Alice and Bob together. Each epoch represents having trained both parties once. 
+
+As in Figure 1, we found that the adversary quickly loses ability to decrypt and Alice and Bob converge to an effective protocol. Nevertheless, in all of our experimentations we found that once Eve drifted away from   
 \begin{figure}
-\vspace{2.5cm}
-\caption{This is the caption of the figure displaying a white eagle and
-a white horse on a snow field}
+  \centering
+    \includegraphics[width=\textwidth]{GAN_anc.png}
+    \caption{Results observed using GANs}
 \end{figure}
 
-Since $u_{1}$ is a smooth function, we will have
-$\left\|hu_{1}\right\|_\infty \le \eta$
-for $h$ small enough, and inequality (\ref{eq:two}) will hold,
-yielding thereby:
-\begin{equation}
-  \psi (hu_{1}) \le \frac{h^{2}}{2}
-  \frac{1}{\lambda} \left\|u_{1} \right\|_{2}^{2} + \frac{h^{2}}{2}
-  \frac{1}{\delta '} \left\|u_{1}\right\|^{2}\ .
-\end{equation}
+\subsection{DQN and Policy Gradient}
 
-If we choose $\delta '$ close enough to $\delta$, the quantity
-$\left(\frac{1}{\lambda} + \frac{1}{\delta '}\right)$
-will be negative, and we end up with
-\begin{equation}
-  \psi (hu_{1}) < 0\ \ \ \ \ {\rm for}\ \ h\ne 0\ \ {\rm small}\ .
-\end{equation}
+We omit any charts because we could not get either algorithm to converge to expected behavior in our experimentation given the number of episodes that time permitted. Nevertheless, this fits well with our theoretical considerations. We used an open source multi-agent reinforcement learning testbed (\url{https://github.com/sisl/MADRL}) to gather these results. 
 
-On the other hand, we check directly that $\psi (0) = 0$. This shows
-that 0 cannot be a minimizer of $\psi$, not even a local one.
-So $\overline{u} \ne 0$ and
-$\overline{u} \ne \Lambda_{o}^{-1} (0) = 0$. \qed
-\end{proof}
-%
-\begin{corollary}
-Assume $H$ is $C^{2}$ and
-$\left(a_{\infty},b_{\infty}\right)$-subquadratic at infinity. Let
-$\xi_{1},\allowbreak\dots,\allowbreak\xi_{N}$  be the
-equilibria, that is, the solutions of $H' (\xi ) = 0$.
-Denote by $\omega_{k}$
-the smallest eigenvalue of $H'' \left(\xi_{k}\right)$, and set:
-\begin{equation}
-  \omega : = {\rm Min\,} \left\{\omega_{1},\dots,\omega_{k}\right\}\ .
-\end{equation}
-If:
-\begin{equation}
-  \frac{T}{2\pi} b_{\infty} <
-  - E \left[- \frac{T}{2\pi}a_{\infty}\right] <
-  \frac{T}{2\pi}\omega
-  \label{eq:three}
-\end{equation}
-then minimization of $\psi$ yields a non-constant $T$-periodic solution
-$\overline{x}$.
-\end{corollary}
-%
+\subsection{Multi-Agent Deep Deterministic Policy Gradient}
 
-We recall once more that by the integer part $E [\alpha ]$ of
-$\alpha \in \bbbr$, we mean the $a\in \bbbz$
-such that $a< \alpha \le a+1$. For instance,
-if we take $a_{\infty} = 0$, Corollary 2 tells
-us that $\overline{x}$ exists and is
-non-constant provided that:
+\subsection{Brief Comparison}
 
-\begin{equation}
-  \frac{T}{2\pi} b_{\infty} < 1 < \frac{T}{2\pi}
-\end{equation}
-or
-\begin{equation}
-  T\in \left(\frac{2\pi}{\omega},\frac{2\pi}{b_{\infty}}\right)\ .
-  \label{eq:four}
-\end{equation}
+It's trivially difficult to make a direct comparison between the two set-ups because the games have a different fundamental structure. Nevertheless, we can still define our goal as to secure some means of private communication between agents in the face of an adversary with as little of 
 
-%
-\begin{proof}
-The spectrum of $\Lambda$ is $\frac{2\pi}{T} \bbbz +a_{\infty}$. The
-largest negative eigenvalue $\lambda$ is given by
-$\frac{2\pi}{T}k_{o} +a_{\infty}$,
-where
-\begin{equation}
-  \frac{2\pi}{T}k_{o} + a_{\infty} < 0
-  \le \frac{2\pi}{T} (k_{o} +1) + a_{\infty}\ .
-\end{equation}
-Hence:
-\begin{equation}
-  k_{o} = E \left[- \frac{T}{2\pi} a_{\infty}\right] \ .
-\end{equation}
+\section{Conclusion}
 
-The condition $\gamma < -\lambda < \delta$ now becomes:
-\begin{equation}
-  b_{\infty} - a_{\infty} <
-  - \frac{2\pi}{T} k_{o} -a_{\infty} < \omega -a_{\infty}
-\end{equation}
-which is precisely condition (\ref{eq:three}).\qed
-\end{proof}
-%
+We showed that it is difficult to derive meaningful results when using the classic RL algorithms in the multi-agent setting theoretically and empirically in the lens of protected communications. 
 
-\begin{lemma}
-Assume that $H$ is $C^{2}$ on $\bbbr^{2n} \setminus \{ 0\}$ and
-that $H'' (x)$ is non-de\-gen\-er\-ate for any $x\ne 0$. Then any local
-minimizer $\widetilde{x}$ of $\psi$ has minimal period $T$.
-\end{lemma}
-%
-\begin{proof}
-We know that $\widetilde{x}$, or
-$\widetilde{x} + \xi$ for some constant $\xi
-\in \bbbr^{2n}$, is a $T$-periodic solution of the Hamiltonian system:
-\begin{equation}
-  \dot{x} = JH' (x)\ .
-\end{equation}
+Nevertheless, interesting results are feasible with GANs though they might be weaker in nature than the results found using MADDPG given the weak ability of the adversary in the GAN context. 
+\subsection{Further Development}
 
-There is no loss of generality in taking $\xi = 0$. So
-$\psi (x) \ge \psi (\widetilde{x} )$
-for all $\widetilde{x}$ in some neighbourhood of $x$ in
-$W^{1,2} \left(\bbbr / T\bbbz ; \bbbr^{2n}\right)$.
+Other interesting multi-agent reinforcement learning algorithms exist and would be worth testing\cite{gupta2017cooperative}. Furthermore, we redefined the precise structure of our game several times during development, varying what types of actions each agent can make in addition to the reward structure. If time had allowed, it would've been useful to quantify the effect of these changes. It's also interesting to consider the case of having a greater number of adversaries or "good" communicators. 
 
-But this index is precisely the index
-$i_{T} (\widetilde{x} )$ of the $T$-periodic
-solution $\widetilde{x}$ over the interval
-$(0,T)$, as defined in Sect.~2.6. So
-\begin{equation}
-  i_{T} (\widetilde{x} ) = 0\ .
-  \label{eq:five}
-\end{equation}
+Finally, there are several ways with which we could've empirically shown that GANs are weak at decrypting and hence don't represent a strong result in addition to the failure of traditional reinforcement learning algorithms in this arena. While we observed this qualitatively, it would be a sound extension to demonstrate this with further experiments. Potentially, too, it could be interesting to mix GANs with RL agents. 
+\subsection{Thanks}
 
-Now if $\widetilde{x}$ has a lower period, $T/k$ say,
-we would have, by Corollary 31:
-\begin{equation}
-  i_{T} (\widetilde{x} ) =
-  i_{kT/k}(\widetilde{x} ) \ge
-  ki_{T/k} (\widetilde{x} ) + k-1 \ge k-1 \ge 1\ .
-\end{equation}
+Thanks to Prof. Parr for giving me enough time to jam this project into a short period of time. I was able to learn how to run deep reinforcement learning experiments in the cloud, understand a bit about cryptography and GANs, develop an understanding of Markov games, multi-agent reinforcement learning, and some interesting algorithms that have been developed to fill the holes that I mentioned above in the simple single-agent extension algorithms. 
 
-This would contradict (\ref{eq:five}), and thus cannot happen.\qed
-\end{proof}
-%
-\paragraph{Notes and Comments.}
-The results in this section are a
-refined version of \cite{clar:eke};
-the minimality result of Proposition
-14 was the first of its kind.
-
-To understand the nontriviality conditions, such as the one in formula
-(\ref{eq:four}), one may think of a one-parameter family
-$x_{T}$, $T\in \left(2\pi\omega^{-1}, 2\pi b_{\infty}^{-1}\right)$
-of periodic solutions, $x_{T} (0) = x_{T} (T)$,
-with $x_{T}$ going away to infinity when $T\to 2\pi \omega^{-1}$,
-which is the period of the linearized system at 0.
-
-\begin{table}
-\caption{This is the example table taken out of {\it The
-\TeX{}book,} p.\,246}
-\begin{center}
-\begin{tabular}{r@{\quad}rl}
-\hline
-\multicolumn{1}{l}{\rule{0pt}{12pt}
-                   Year}&\multicolumn{2}{l}{World population}\\[2pt]
-\hline\rule{0pt}{12pt}
-8000 B.C.  &     5,000,000& \\
-  50 A.D.  &   200,000,000& \\
-1650 A.D.  &   500,000,000& \\
-1945 A.D.  & 2,300,000,000& \\
-1980 A.D.  & 4,400,000,000& \\[2pt]
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-%
-\begin{theorem} [Ghoussoub-Preiss]\label{ghou:pre}
-Assume $H(t,x)$ is
-$(0,\varepsilon )$-subquadratic at
-infinity for all $\varepsilon > 0$, and $T$-periodic in $t$
-\begin{equation}
-  H (t,\cdot )\ \ \ \ \ {\rm is\ convex}\ \ \forall t
-\end{equation}
-\begin{equation}
-  H (\cdot ,x)\ \ \ \ \ {\rm is}\ \ T{\rm -periodic}\ \ \forall x
-\end{equation}
-\begin{equation}
-  H (t,x)\ge n\left(\left\|x\right\|\right)\ \ \ \ \
-  {\rm with}\ \ n (s)s^{-1}\to \infty\ \ {\rm as}\ \ s\to \infty
-\end{equation}
-\begin{equation}
-  \forall \varepsilon > 0\ ,\ \ \ \exists c\ :\
-  H(t,x) \le \frac{\varepsilon}{2}\left\|x\right\|^{2} + c\ .
-\end{equation}
-
-Assume also that $H$ is $C^{2}$, and $H'' (t,x)$ is positive definite
-everywhere. Then there is a sequence $x_{k}$, $k\in \bbbn$, of
-$kT$-periodic solutions of the system
-\begin{equation}
-  \dot{x} = JH' (t,x)
-\end{equation}
-such that, for every $k\in \bbbn$, there is some $p_{o}\in\bbbn$ with:
-\begin{equation}
-  p\ge p_{o}\Rightarrow x_{pk} \ne x_{k}\ .
-\end{equation}
-\qed
-\end{theorem}
-%
-\begin{example} [{{\rm External forcing}}]
-Consider the system:
-\begin{equation}
-  \dot{x} = JH' (x) + f(t)
-\end{equation}
-where the Hamiltonian $H$ is
-$\left(0,b_{\infty}\right)$-subquadratic, and the
-forcing term is a distribution on the circle:
-\begin{equation}
-  f = \frac{d}{dt} F + f_{o}\ \ \ \ \
-  {\rm with}\ \ F\in L^{2} \left(\bbbr / T\bbbz; \bbbr^{2n}\right)\ ,
-\end{equation}
-where $f_{o} : = T^{-1}\int_{o}^{T} f (t) dt$. For instance,
-\begin{equation}
-  f (t) = \sum_{k\in \bbbn} \delta_{k} \xi\ ,
-\end{equation}
-where $\delta_{k}$ is the Dirac mass at $t= k$ and
-$\xi \in \bbbr^{2n}$ is a
-constant, fits the prescription. This means that the system
-$\dot{x} = JH' (x)$ is being excited by a
-series of identical shocks at interval $T$.
-\end{example}
-%
-\begin{definition}
-Let $A_{\infty} (t)$ and $B_{\infty} (t)$ be symmetric
-operators in $\bbbr^{2n}$, depending continuously on
-$t\in [0,T]$, such that
-$A_{\infty} (t) \le B_{\infty} (t)$ for all $t$.
-
-A Borelian function
-$H: [0,T]\times \bbbr^{2n} \to \bbbr$
-is called
-$\left(A_{\infty} ,B_{\infty}\right)$-{\it subquadratic at infinity}
-if there exists a function $N(t,x)$ such that:
-\begin{equation}
-  H (t,x) = \frac{1}{2} \left(A_{\infty} (t) x,x\right) + N(t,x)
-\end{equation}
-\begin{equation}
-  \forall t\ ,\ \ \ N(t,x)\ \ \ \ \
-  {\rm is\ convex\ with\  respect\  to}\ \ x
-\end{equation}
-\begin{equation}
-  N(t,x) \ge n\left(\left\|x\right\|\right)\ \ \ \ \
-  {\rm with}\ \ n(s)s^{-1}\to +\infty\ \ {\rm as}\ \ s\to +\infty
-\end{equation}
-\begin{equation}
-  \exists c\in \bbbr\ :\ \ \ H (t,x) \le
-  \frac{1}{2} \left(B_{\infty} (t) x,x\right) + c\ \ \ \forall x\ .
-\end{equation}
-
-If $A_{\infty} (t) = a_{\infty} I$ and
-$B_{\infty} (t) = b_{\infty} I$, with
-$a_{\infty} \le b_{\infty} \in \bbbr$,
-we shall say that $H$ is
-$\left(a_{\infty},b_{\infty}\right)$-subquadratic
-at infinity. As an example, the function
-$\left\|x\right\|^{\alpha}$, with
-$1\le \alpha < 2$, is $(0,\varepsilon )$-subquadratic at infinity
-for every $\varepsilon > 0$. Similarly, the Hamiltonian
-\begin{equation}
-H (t,x) = \frac{1}{2} k \left\|k\right\|^{2} +\left\|x\right\|^{\alpha}
-\end{equation}
-is $(k,k+\varepsilon )$-subquadratic for every $\varepsilon > 0$.
-Note that, if $k<0$, it is not convex.
-\end{definition}
-%
-
-\paragraph{Notes and Comments.}
-The first results on subharmonics were
-obtained by Rabinowitz in \cite{rab}, who showed the existence of
-infinitely many subharmonics both in the subquadratic and superquadratic
-case, with suitable growth conditions on $H'$. Again the duality
-approach enabled Clarke and Ekeland in \cite{clar:eke:2} to treat the
-same problem in the convex-subquadratic case, with growth conditions on
-$H$ only.
-
-Recently, Michalek and Tarantello (see \cite{mich:tar} and \cite{tar})
-have obtained lower bound on the number of subharmonics of period $kT$,
-based on symmetry considerations and on pinching estimates, as in
-Sect.~5.2 of this article.
+Thanks to Barrett for consulting on this project and being flexible with his schedule in addition to being happy to provide feedback. 
 
 \bibliographystyle{ieeetr}
 \bibliography{cs590}

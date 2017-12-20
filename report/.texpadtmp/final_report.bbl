@@ -1,14 +1,40 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
-\bibitem{elderman2017adversarial}
-R.~Elderman, L.~J. Pater, A.~S. Thie, M.~M. Drugan, and M.~Wiering,
-  ``Adversarial reinforcement learning in a cyber security simulation.,'' in
-  {\em ICAART (2)}, pp.~559--566, 2017.
+\bibitem{lowe2017multi}
+R.~Lowe, Y.~Wu, A.~Tamar, J.~Harb, P.~Abbeel, and I.~Mordatch, ``Multi-agent
+  actor-critic for mixed cooperative-competitive environments,'' {\em arXiv
+  preprint arXiv:1706.02275}, 2017.
+
+\bibitem{leibo2017multi}
+J.~Z. Leibo, V.~Zambaldi, M.~Lanctot, J.~Marecki, and T.~Graepel, ``Multi-agent
+  reinforcement learning in sequential social dilemmas,'' in {\em Proceedings
+  of the 16th Conference on Autonomous Agents and MultiAgent Systems},
+  pp.~464--473, International Foundation for Autonomous Agents and Multiagent
+  Systems, 2017.
+
+\bibitem{foerster2016learning}
+J.~Foerster, Y.~Assael, N.~de~Freitas, and S.~Whiteson, ``Learning to
+  communicate with deep multi-agent reinforcement learning,'' in {\em Advances
+  in Neural Information Processing Systems}, pp.~2137--2145, 2016.
+
+\bibitem{pinto2017robust}
+L.~Pinto, J.~Davidson, R.~Sukthankar, and A.~Gupta, ``Robust adversarial
+  reinforcement learning,'' {\em arXiv preprint arXiv:1703.02702}, 2017.
+
+\bibitem{gupta2017cooperative}
+J.~K. Gupta, M.~Egorov, and M.~Kochenderfer, ``Cooperative multi-agent control
+  using deep reinforcement learning,'' in {\em International Conference on
+  Autonomous Agents and Multiagent Systems}, pp.~66--83, Springer, 2017.
 
 \bibitem{abadi2016learning}
 M.~Abadi and D.~G. Andersen, ``Learning to protect communications with
   adversarial neural cryptography,'' {\em arXiv preprint arXiv:1610.06918},
   2016.
+
+\bibitem{elderman2017adversarial}
+R.~Elderman, L.~J. Pater, A.~S. Thie, M.~M. Drugan, and M.~Wiering,
+  ``Adversarial reinforcement learning in a cyber security simulation.,'' in
+  {\em ICAART (2)}, pp.~559--566, 2017.
 
 \bibitem{shiva2010game}
 S.~Shiva, S.~Roy, and D.~Dasgupta, ``Game theory for cyber security,'' in {\em
@@ -23,10 +49,6 @@ C.~Finn, P.~Christiano, P.~Abbeel, and S.~Levine, ``A connection between
 \bibitem{pfau2016connecting}
 D.~Pfau and O.~Vinyals, ``Connecting generative adversarial networks and
   actor-critic methods,'' {\em arXiv preprint arXiv:1610.01945}, 2016.
-
-\bibitem{pinto2017robust}
-L.~Pinto, J.~Davidson, R.~Sukthankar, and A.~Gupta, ``Robust adversarial
-  reinforcement learning,'' {\em arXiv preprint arXiv:1703.02702}, 2017.
 
 \bibitem{lin2014multi}
 X.~Lin, P.~A. Beling, and R.~Cogill, ``Multi-agent inverse reinforcement
