@@ -61,7 +61,7 @@ def train(sess,env,args,actors,critics,noise):
 			for i in range(env.n):
 				actor = actors[i]
 				a.append(actor.act(np.reshape(s[i],(-1,actor.state_dim)),noise[i]()).reshape(actor.action_dim,))
-			print("Action: {}".format(a), "\n Step: %d" % stp)
+#			print("Action: {}\n Step: {}".format(a, stp))
 			s2,r,done,_ = env.step(a) # a is a list with each element being an array
 			replayMemory.add(s,a,r,done,s2)
 			s = s2
