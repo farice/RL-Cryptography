@@ -12,7 +12,7 @@ import argparse
 def main(args):
 
     with tf.Session() as sess:
-        env  = make_env.make_env('simple_tag')
+        env  = make_env.make_env('crypto_game')
 
         np.random.seed(int(args['random_seed']))
         tf.set_random_seed(int(args['random_seed']))

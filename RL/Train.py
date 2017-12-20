@@ -117,4 +117,6 @@ def train(sess,env,args,actors,critics,noise):
 				break
 
 			if stp == int(args['max_episode_len'])-1:
+				print("Plotting")
+				env._get_info()
 				print ('|Reward: {}	| Episode: {:d}'.format(episode_reward,ep))
