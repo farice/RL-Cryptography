@@ -81,8 +81,7 @@ Nevertheless, studying multi-agent systems is increasingly important if we expec
 Here we consider a mixed cooperative-competitive where an agent must communicate to another agent in the presence of an adversary. We find this worth considering because it allows us to study (1) the effectiveness of various RL and non-RL algorithms in a Markov game (defined below) of this type, (2) whether agents can protect their communications without being provided with an explicit cryptographic algorithm, and more broadly (3) whether and/or what kind of equilibria we observe depending on our algorithm and reward structures. 
 
 Ultimately, we show that the simple multi-agent extensions of popular reinforcement learning algorithms perform poorly while the Multi-Agent Deep Deterministic Policy Gradient algorithm developed in \cite{lowe2017multi} produces a competitive game. Furthermore, the GAN context described in \cite{abadi2016learning} seems to allow for protected communications between agents but we'll argue that it's likely because of the limited decryption capability one might expect in this setup. 
-
-Hence, the goal of this paper is to take the cryptography game defined in \cite{abadi2016learning} which is suitable for GANs, then to revise and modify it as a Markov game so it is suitable for the multi-agent RL context, and finally to evaluate the effectiveness of various MARL algorithms in this setting.
+%Hence, the goal of this paper is to take the cryptography game defined in \cite{abadi2016learning} which is suitable for GANs, then to revise and modify it as a Markov game so it is suitable for the multi-agent RL context, and finally to evaluate the effectiveness of various MARL algorithms in this setting.
 \subsection{The Problem}
 %
 The general game is simple.
@@ -97,12 +96,21 @@ With this notation in mind, we can readily popular single-agent algorithms to th
 
 $Q$-learning uses an action-value function for a policy which can be written recursively as $Q^\pi(s,a)= \mathbb{E}_{s'}[r(s,a) + \gamma \mathbb{E}_{a'}[Q^\pi(s', a')]]$. Hence, $Q$-learning can be extended by simply allowing each agent to learn its independently optimal $Q_i$. 
 
-Policy gradient 
+Policy gradient can likewise be extended for example by approximating by again having each agent learn its own $Q_i$. 
 
 \subsection{Multi-Agent Deep Deterministic Policy Gradient}
 
+Multi-Agent Deep Deterministic Policy Gradient is described by Lowe et. al\cite{lowe2017multi} and is noteworthy because it adopts centralized training with decentralized execution. Hence, it is an actor-critic policy gradient algorithm where the centralized critic is augmented with information about the policies of other agents. The motivation is that if the actions taken by all agents are known, then environment is stationary even as the policies change. So, the centralized $Q$ action-value function takes in the inputs of all agents and outputs the $Q$-value for each agent. 
+
 \section{Theoretical Matters}
 
+There are clear issues with the popular single-agent extensions. 
+
+First, in the case of $Q$-learning, when each agent updates its individual $Q_i$ the environment appears non-stationary hence violating the Markov property. Furthermore, experience replay in the case of DQN is no longer useful because of each agent's policy being dependent on the policy implemented by the other agents.
+
+Furthermore, policy gradient methods are known to be of high-variance and this is exacerbated in multi-agent settings\cite{lowe2017multi}.
+
+Conceptually, it's clear why MADDPG is particularly useful in our case. If training is centralized and the policies are used to train each agent in our cryptography game, then we can expect added competition and the ability for each agent to uncover motivations in its competitor. 
 \section{Experiments}
 
 \subsection{GANs}
@@ -113,9 +121,10 @@ In summary, we had Alice, Bob, and Eve represented as neural networks. Alice has
 
 Eve has the simple loss function which corresponds to the L1 distance between $P_E$ and $P$. Alice and Bob share the loss function which corresponds to L1 distance between $P_B$ and $P$ minus $(N/2 - \text{Eve L1 error})^2/(N/2)^2$ where $N$ is the length of $P$. The authors note the peculiarity of this loss function.
 
-In addition to this peculiarity, the authors concede that they had to cute a number of corners to achieve the expected behavior. Note also that the agents are trained in an alternating pattern, switch back and forth between training Eve and then Alice and Bob together. Each epoch represents having trained both parties once. 
+In addition to this peculiarity, the authors concede that they had to cut a number of corners to achieve the expected behavior. Note also that the agents are trained in an alternating pattern, switch back and forth between training Eve and then Alice and Bob together. Each epoch represents having trained both parties once. 
 
-As in Figure 1, we found that the adversary quickly loses ability to decrypt and Alice and Bob converge to an effective protocol. Nevertheless, in all of our experimentations we found that once Eve drifted away from   
+In our experiments we let the size of the plaintext and key be 4 and the range of values each of the four entries can be -1 to 1. As in Figure 1, we found that the adversary quickly loses ability to decrypt and Alice and Bob converge to an effective protocol. Nevertheless, in all of our experimentations we found that once Eve drifted away from being able to decrypt the message, it never erred back away from randomness. Hence, this may represent a weakness of adversaries in this setup. 
+
 \begin{figure}
   \centering
     \includegraphics[width=\textwidth]{GAN_anc.png}
@@ -124,13 +133,31 @@ As in Figure 1, we found that the adversary quickly loses ability to decrypt and
 
 \subsection{DQN and Policy Gradient}
 
-We omit any charts because we could not get either algorithm to converge to expected behavior in our experimentation given the number of episodes that time permitted. Nevertheless, this fits well with our theoretical considerations. We used an open source multi-agent reinforcement learning testbed (\url{https://github.com/sisl/MADRL}) to gather these results. 
+We omit any charts because we failed to have either algorithm converge to expected behavior in our experimentation given the number of episodes that time permitted i.e. Adam and Bob could not communicate without Eve fully decrypting the message. 
 
+Nevertheless, this fits well with our theoretical considerations. We used an open source multi-agent reinforcement learning testbed (\url{https://github.com/sisl/MADRL}) to gather these results. 
 \subsection{Multi-Agent Deep Deterministic Policy Gradient}
+Here we used OpenAI Gym and OpenAI multi-agent-environment-specific code to define our environment and cryptography game. Furthermore, we use TensorFlow to develop the MADDPG algorithm. We validated the algorithm by testing it on a "predator-prey" environment open sourced by OpenAI. We trained the algorithm for 1000 episodes with 1000 steps per episode on a GPU-compute optimized instance on AWS. 
 
-\subsection{Brief Comparison}
+We defined our Markov game as analogously as possible to above. We allowed for size $N$ symmetric keys and plaintexts with $N$ values ranging from -1 to 1. Hence, we uniformly at random select initial values for each of these in $[-1, 1]$. Furthermore, we allow a continuous action space across this range for each agent; we define an action to be a length $N$ message that is broadcasted to all agents. Hence, ideally, Alice and Bob can arrange some coded manner of speaking with one another that uses the hidden information (key) and hence won't be learned by Eve. We choose $N=4$ to be consistent. Alice and Bob are rewarded for minimizing the difference between Bob's interpretation of Alice's broadcast message and the original messaged and penalized for Eve's correct interpretation of the message. Eve is rewarded for its correct interpretation of the message.
 
-It's trivially difficult to make a direct comparison between the two set-ups because the games have a different fundamental structure. Nevertheless, we can still define our goal as to secure some means of private communication between agents in the face of an adversary with as little of 
+Now, applying the MADDPG algorithm described above, we noticed that after a few hundred episodes Adam and Bob would pull away from the adversary. Nevertheless, it remains a competitive game and Eve often is able to recover. This may represent Alice and Bob creating a simple coded-language policy which doesn't combine the key and hence can be learned by Eve. 
+
+Ultimately, Adam and Bob generally are able to reach an equilibrium and pull away entirely after about 500 episodes. This may represent Alice and Bob determining an effective policy combining the key. 
+
+\begin{figure}
+  \centering
+    \includegraphics[width=\textwidth]{RL_anc.png}
+    \caption{Results observed using MADDPG. Bob (Brown) and Eve (Purple).}
+\end{figure}
+
+An example is shown in Figure 2. Here we see a slight pulling away after 150 episodes, only to be met by Eve's full recovery and then more pulling away. In our experiments, we found an equilibrium of secure communication after about 500 episodes. 
+
+\subsection{Brief Comparisons}
+
+It's unfair to make a direct comparison between the GAN and MADDPG set-ups because the games have a technically different fundamental structure. Nevertheless, we can still define our goal as to secure some means of private communication between agents in the face of \textit{the best possible} adversary. Hence, as we noted above, Eve seemed particularly weak and unable to recover from large enough perturbations from accurate decryption in the GAN case. Furthermore, our goal of keeping the emergence of a protected communication protocol as "unsupervised" as possible is clearly best achieved by the RL algorithms because it did not require the "cutting of corners" described by the authors of the GAN paper. 
+
+Finally, one can at least note that the MADDPG algorithm converged at a speed with which the other algorithms could not. This fits with our theoretical considerations. 
 
 \section{Conclusion}
 
@@ -141,7 +168,9 @@ Nevertheless, interesting results are feasible with GANs though they might be we
 
 Other interesting multi-agent reinforcement learning algorithms exist and would be worth testing\cite{gupta2017cooperative}. Furthermore, we redefined the precise structure of our game several times during development, varying what types of actions each agent can make in addition to the reward structure. If time had allowed, it would've been useful to quantify the effect of these changes. It's also interesting to consider the case of having a greater number of adversaries or "good" communicators. 
 
-Finally, there are several ways with which we could've empirically shown that GANs are weak at decrypting and hence don't represent a strong result in addition to the failure of traditional reinforcement learning algorithms in this arena. While we observed this qualitatively, it would be a sound extension to demonstrate this with further experiments. Potentially, too, it could be interesting to mix GANs with RL agents. 
+We'd also like to analyze the convergent policy in the RL setting and determine if it's some clear kind of combination with the shared symmetric key. 
+
+Finally, it could be interesting to mix GANs with RL agents. Perhaps, then, we can show that a MADDPG adversary is a better approximation of the best possible adversary. 
 \subsection{Thanks}
 
 Thanks to Prof. Parr for giving me enough time to jam this project into a short period of time. I was able to learn how to run deep reinforcement learning experiments in the cloud, understand a bit about cryptography and GANs, develop an understanding of Markov games, multi-agent reinforcement learning, and some interesting algorithms that have been developed to fill the holes that I mentioned above in the simple single-agent extension algorithms. 
