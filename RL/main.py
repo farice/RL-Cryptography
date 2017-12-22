@@ -5,7 +5,7 @@ import numpy as np
 #import random
 #from ReplayMemory import ReplayMemory
 from ExplorationNoise import OrnsteinUhlenbeckActionNoise as OUNoise
-from actorcriticv2 import ActorNetwork,CriticNetwork
+from ActorCritic import ActorNetwork,CriticNetwork
 from Train import train
 import argparse
 
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('--use-gym-monitor', help='record gym results', action='store_true')
     parser.add_argument('--monitor-dir', help='directory for storing gym results', default='./results/gym_ddpg_3')
     parser.add_argument('--summary-dir', help='directory for storing tensorboard info', default='./results/tf_ddpg_3')
+    parser.add_argument('--verbose', help='Verbose output', action='store_true')
 
     parser.set_defaults(render_env=False)
     parser.set_defaults(use_gym_monitor=True)

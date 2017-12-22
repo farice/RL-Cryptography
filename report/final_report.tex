@@ -155,7 +155,7 @@ An example is shown in Figure 2. Here we see a slight pulling away after 150 epi
 
 \subsection{Brief Comparisons}
 
-It's unfair to make a direct comparison between the GAN and MADDPG set-ups because the games have a technically different fundamental structure. Nevertheless, we can still define our goal as to secure some means of private communication between agents in the face of \textit{the best possible} adversary. Hence, as we noted above, Eve seemed particularly weak and unable to recover from large enough perturbations from accurate decryption in the GAN case. Furthermore, our goal of keeping the emergence of a protected communication protocol as "unsupervised" as possible is clearly best achieved by the RL algorithms because it did not require the "cutting of corners" described by the authors of the GAN paper. 
+It's difficult to make a direct comparison between the GAN and MADDPG set-ups because the games have a technically different fundamental structure. Nevertheless, we can still define our goal as to secure some means of private communication between agents in the face of \textit{the best possible} adversary. Hence, as we noted above, Eve seemed particularly weak and unable to recover from large enough perturbations from accurate decryption in the GAN case. Furthermore, our goal of keeping the emergence of a protected communication protocol as "unsupervised" as possible is clearly best achieved by the RL algorithms because it did not require the "cutting of corners" described by the authors of the GAN paper. 
 
 Finally, one can at least note that the MADDPG algorithm converged at a speed with which the other algorithms could not. This fits with our theoretical considerations. 
 
@@ -170,7 +170,7 @@ Other interesting multi-agent reinforcement learning algorithms exist and would 
 
 We'd also like to analyze the convergent policy in the RL setting and determine if it's some clear kind of combination with the shared symmetric key. 
 
-Finally, it could be interesting to mix GANs with RL agents. Perhaps, then, we can show that a MADDPG adversary is a better approximation of the best possible adversary. 
+Finally, it could be interesting to consider combinations of RL and neural network agents. Though, we would then lose the primary benefit of MADDPG, which is agents sharing a critic.
 \subsection{Thanks}
 
 Thanks to Prof. Parr for giving me enough time to jam this project into a short period of time. I was able to learn how to run deep reinforcement learning experiments in the cloud, understand a bit about cryptography and GANs, develop an understanding of Markov games, multi-agent reinforcement learning, and some interesting algorithms that have been developed to fill the holes that I mentioned above in the simple single-agent extension algorithms. 

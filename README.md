@@ -54,4 +54,4 @@ $ (rl-cryp) deactivate
 
 ## Cited Projects
 * ankeshanand's [implementation of ANC](https://github.com/ankeshanand/neural-cryptography-tensorflow) in TensorFlow
-* Liam's [implementation of ANC](https://github.com/nlml/adversarial-neural-crypt) of Adversarial Neural Cryptography in Theano.
+* Thanks to @agakshat for his MADDPG starter code
